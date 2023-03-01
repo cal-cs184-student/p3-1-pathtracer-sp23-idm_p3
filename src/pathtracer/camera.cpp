@@ -189,14 +189,17 @@ void Camera::load_settings(string filename) {
  */
 Ray Camera::generate_ray(double x, double y) const {
 
-  // TODO (Part 1.1):
-  // compute position of the input sensor sample coordinate on the
-  // canonical sensor plane one unit away from the pinhole.
-  // Note: hFov and vFov are in degrees.
-  //
-
-
-  return Ray(pos, Vector3D(0, 0, -1));
+    // TODO (Part 1.1):
+    // compute position of the input sensor sample coordinate on the
+    // canonical sensor plane one unit away from the pinhole.
+    // Note: hFov and vFov are in degrees.
+  
+    double u = (2. * x - 1.) * tan(0.5 * radians(hFov));
+    double v = (2. * y - 1.) * tan(0.5 * radians(vFov));
+    
+    Ray r = Ray(pos, c2w * Vector3D(u, v, -1), fClip);
+    r.min_t = nClip;
+    return r;
 
 }
 

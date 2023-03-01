@@ -173,21 +173,27 @@ Vector3D PathTracer::est_radiance_global_illumination(const Ray &r) {
 }
 
 void PathTracer::raytrace_pixel(size_t x, size_t y) {
-  // TODO (Part 1.2):
-  // Make a loop that generates num_samples camera rays and traces them
-  // through the scene. Return the average Vector3D.
-  // You should call est_radiance_global_illumination in this function.
+    // TODO (Part 1.2):
+    // Make a loop that generates num_samples camera rays and traces them
+    // through the scene. Return the average Vector3D.
+    // You should call est_radiance_global_illumination in this function.
+    // 
+    // TODO (Part 5):
+    // Modify your implementation to include adaptive sampling.
+    // Use the command line parameters "samplesPerBatch" and "maxTolerance"
 
-  // TODO (Part 5):
-  // Modify your implementation to include adaptive sampling.
-  // Use the command line parameters "samplesPerBatch" and "maxTolerance"
+    int num_samples = ns_aa;          // total samples to evaluate
+    Vector2D origin = Vector2D(x, y); // bottom left corner of the pixel
 
-  int num_samples = ns_aa;          // total samples to evaluate
-  Vector2D origin = Vector2D(x, y); // bottom left corner of the pixel
+    Vector3D color(0);
+    for (int i = 0; i < num_samples; i++) {
+        Vector2D r = gridSampler->get_sample();
+        Ray ray = camera->generate_ray((1. * x + r.x) / sampleBuffer.w, (1. * y + r.y) / sampleBuffer.h);
+        color += 1. / num_samples * est_radiance_global_illumination(ray);
+    }
 
-
-  sampleBuffer.update_pixel(Vector3D(0.2, 1.0, 0.8), x, y);
-  sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
+    sampleBuffer.update_pixel(color, x, y);
+    sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
 
 
 }

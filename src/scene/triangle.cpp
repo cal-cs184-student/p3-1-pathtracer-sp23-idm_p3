@@ -23,25 +23,54 @@ Triangle::Triangle(const Mesh *mesh, size_t v1, size_t v2, size_t v3) {
 BBox Triangle::get_bbox() const { return bbox; }
 
 bool Triangle::has_intersection(const Ray &r) const {
-  // Part 1, Task 3: implement ray-triangle intersection
-  // The difference between this function and the next function is that the next
-  // function records the "intersection" while this function only tests whether
-  // there is a intersection.
-
-
-  return true;
-
+	// Part 1, Task 3: implement ray-triangle intersection
+	// The difference between this function and the next function is that the next
+	// function records the "intersection" while this function only tests whether
+	// there is a intersection.
+	Vector3D E1 = p2 - p1;
+	Vector3D E2 = p3 - p1;
+	Vector3D S = r.o - p1;
+	Vector3D S1 = cross(r.d, E2);
+	Vector3D S2 = cross(S, E1);
+	double M = 1. / dot(S1, E1);
+	double t = dot(S2, E2) / M;
+	if (t < r.min_t || t > r.max_t)
+		return false;
+	double b1 = dot(S1, S) / M;
+	if (b1 < 0 || b1 > 1)
+		return false;
+	double b2 = dot(S2, r.d) / M;
+	if (b2 < 0 || b2 > 1 || b1 + b2 > 1)
+		return false;
+	return true;
 }
 
 bool Triangle::intersect(const Ray &r, Intersection *isect) const {
-  // Part 1, Task 3:
-  // implement ray-triangle intersection. When an intersection takes
-  // place, the Intersection data should be updated accordingly
-
-
-  return true;
-
-
+	// Part 1, Task 3:
+	// implement ray-triangle intersection. When an intersection takes
+	// place, the Intersection data should be updated accordingly
+	Vector3D E1 = p2 - p1;
+	Vector3D E2 = p3 - p1;
+	Vector3D S = r.o - p1;
+	Vector3D S1 = cross(r.d, E2);
+	Vector3D S2 = cross(S, E1);
+	double M = 1. / dot(S1, E1);
+	double t = dot(S2, E2) * M;
+	if (t < r.min_t || t > r.max_t)
+		return false;
+	double b1 = dot(S1, S) * M;
+	if (b1 < 0 || b1 > 1)
+		return false;
+	double b2 = dot(S2, r.d) * M;
+	if (b2 < 0 || b2 > 1 || b1 + b2 > 1)
+		return false;
+	r.max_t = t;
+	isect->t = t;
+	isect->n = (1. - b1 - b2) * n1 + b1 * n2 + b2 * n3;
+	isect->n.normalize();
+	isect->primitive = this;
+	isect->bsdf = get_bsdf();
+	return true;
 }
 
 void Triangle::draw(const Color &c, float alpha) const {
