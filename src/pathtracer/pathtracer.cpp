@@ -151,7 +151,12 @@ namespace CGL {
 		// TODO: Part 3, Task 3
 		// Returns either the direct illumination by hemisphere or importance sampling
 		// depending on `direct_hemisphere_sample`
-		return estimate_direct_lighting_importance(r, isect);
+		if (direct_hemisphere_sample) {
+			return estimate_direct_lighting_hemisphere(r, isect);
+		}
+		else {
+			return estimate_direct_lighting_importance(r, isect);
+		}
 	}
 
 	Vector3D PathTracer::at_least_one_bounce_radiance(const Ray& r,
@@ -189,9 +194,9 @@ namespace CGL {
 
 		if (!bvh->intersect(r, &isect))
 			return L_out;
-
+		L_out = (isect.t == INF_D) ? debug_shading(r.d) : normal_shading(isect.n);
 		// TODO (Part 3): Return the direct illumination.
-		L_out = zero_bounce_radiance(r, isect) + one_bounce_radiance(r, isect);
+		//L_out = zero_bounce_radiance(r, isect) + one_bounce_radiance(r, isect);
 
 		// TODO (Part 4): Accumulate the "direct" and "indirect"
 		// parts of global illumination into L_out rather than just direct

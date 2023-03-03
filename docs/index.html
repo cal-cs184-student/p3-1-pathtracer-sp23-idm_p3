@@ -157,7 +157,7 @@ Show images with normal shading for a few small .dae files. -->
       </td>
       <td>
         <img src="part1/4.png" align="middle" width="400px"/>
-        <figcaption>simple/cube.dae</figcaption>
+        <figcaption>simple/plane.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -259,8 +259,29 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
 <h3>
   Walk through both implementations of the direct lighting function.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    In this part, we implemented uniform hemisphere sampling and lighting sampling, here is how we implemented them:
+    <ul>
+        <li style="line-height:200%">
+            <b>Uniform hemisphere sampling</b>: In uniform hemisphere sampling, 
+            the direct lighting function computes the contribution of each light source by sampling directions on the hemisphere 
+            that is oriented towards the surface being shaded. 
+            This is achieved by generating random directions on the hemisphere and computing the contribution of 
+            each light source in that direction. It is very easy to get the random sampling by <b>sampler</b> and get the 
+            contribution of light source by <b>get_emmision()</b> * Cos(Theta).Then we can calculate the final result combined with <b>BSDF</b>.
+
+
+        </li>
+        <li style="line-height:200%">
+            <b>Lighting sampling</b>: In lighting sampling, the direct lighting function computes the contribution of each light source
+            by sampling points on the surface of the light source and
+            computing the contribution of each point to the final color of the surface being shaded.
+            This is achieved by generating random points on the surface of the light source(<b>light->sample_L</b>)
+            and judging whether the new rays hit other primitives before light sources. We can limit our new_generated rays' <b>max_t</b>
+            to know whether they hit other objects before hitting the lights.The calculation equation is the same as uniform hemisphere sampling,
+            but the logistic is a little bit different.
+        </li>
+    </ul>
 </p>
 
 <h3>
@@ -281,23 +302,23 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
     <br>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="part3/1_1.png" align="middle" width="400px"/>
+        <figcaption>sky/CBbunny.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="part3/1_2.png" align="middle" width="400px"/>
+        <figcaption>sky/CBbunny.dae</figcaption>
       </td>
     </tr>
     <br>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="part3/1_3.png" align="middle" width="400px"/>
+        <figcaption>sky/CBspheres_lambertian.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="part3/1_4.png" align="middle" width="400px"/>
+        <figcaption>sky/CBspheres_lambertian.dae</figcaption>
       </td>
     </tr>
     <br>
@@ -313,36 +334,44 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="200px"/>
-        <figcaption>1 Light Ray (example1.dae)</figcaption>
+        <img src="part3/2_1.png" align="middle" width="200px"/>
+        <figcaption>1 Light Ray (sky/dragon.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="200px"/>
-        <figcaption>4 Light Rays (example1.dae)</figcaption>
+        <img src="part3/2_2.png" align="middle" width="200px"/>
+        <figcaption>4 Light Rays (sky/dragon.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="200px"/>
-        <figcaption>16 Light Rays (example1.dae)</figcaption>
+        <img src="part3/2_3.png" align="middle" width="200px"/>
+        <figcaption>16 Light Rays (sky/dragon.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="200px"/>
-        <figcaption>64 Light Rays (example1.dae)</figcaption>
+        <img src="part3/2_4.png" align="middle" width="200px"/>
+        <figcaption>64 Light Rays (sky/dragon.dae)</figcaption>
       </td>
     </tr>
   </table>
 </div>
-<p>
-    YOUR EXPLANATION GOES HERE
+<p style="line-height:200%">
+    As we can see, the shadows are quite noisy with only 1 light ray and 1 sample per pixel. It looks like the <b>salt-and-pepper</b>
+    noise which contains a lot of black and white points on a smooth surface. It is very easy to understand why it happens. When the number of
+    sampling rays increase, the variance becomes small and the Monte Carlo becomes more stable. For example, it is hard to find the obvious noise on the
+    64-ray sampling result. However, it's worth noting that increasing the number of light rays and samples per pixel comes at the cost of longer render times. So it's often a tradeoff between noise and rendering time.
 </p>
 <br>
 
-<h3>
+<h3 style="line-height:200%">
   Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.
+
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    In general, lighting sampling can produce smoother and more accurate results than uniform hemisphere sampling (refer to the pictures above),
+    .This is because lighting sampling takes into account the actual shape and size of light sources,
+    which can greatly affect the distribution of light on surfaces.On the other hand, uniform hemisphere sampling can be faster and easier to implement than lighting sampling,
+    and may be sufficient for simple scenes.Overall, the choice between uniform hemisphere sampling and lighting sampling depends on the requirements of the final rendering accuracy, 
+    as well as factors such as rendering time and computational resources.
 </p>
 <br>
 
