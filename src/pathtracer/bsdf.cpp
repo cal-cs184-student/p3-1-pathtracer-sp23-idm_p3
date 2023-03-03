@@ -53,7 +53,7 @@ namespace CGL {
 		// TODO (Part 3.1):
 		// This function takes in both wo and wi and returns the evaluation of
 		// the BSDF for those two directions.
-		return reflectance / (2. * PI);
+		return reflectance / PI;
 	}
 
 	/**
@@ -66,7 +66,8 @@ namespace CGL {
 		// After sampling a value for wi, it returns the evaluation of the BSDF
 		// at (wo, *wi).
 		// You can use the `f` function. The reference solution only takes two lines.
-		return Vector3D(1.0);
+		*wi = sampler.get_sample(pdf);
+		return f(wo, *wi);
 
 	}
 

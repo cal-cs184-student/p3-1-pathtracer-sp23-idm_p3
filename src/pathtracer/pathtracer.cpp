@@ -80,10 +80,10 @@ namespace CGL {
 			rr.min_t = EPS_F;
 			Intersection ir;
 			if (bvh->intersect(rr, &ir)) {
-				L_out += (isect.bsdf->f(w_out, wi) * ir.bsdf->get_emission() * wi.z) * 2 * PI / (1. * num_samples);
+				L_out += (isect.bsdf->f(w_out, wi) * ir.bsdf->get_emission() * wi.z) * 2 * PI;
 			}
 		}
-		return L_out;
+		return L_out / num_samples;
 
 	}
 
@@ -111,7 +111,7 @@ namespace CGL {
 		double pdf;
 		Vector3D emission;
 
-		int num_samples = 0;
+		int num_samples = scene->lights.size() * ns_area_light;
 
 		for (auto light : scene->lights) {
 			if (light->is_delta_light()) {
@@ -120,9 +120,8 @@ namespace CGL {
 				rr.min_t = EPS_F;
 				Intersection ir;
 				if (!bvh->intersect(rr, &ir)) {
-					L_out += (isect.bsdf->f(w_out, w2o * wi) * emission * (w2o * wi).z) / pdf;
+					L_out += ns_area_light * (isect.bsdf->f(w_out, w2o * wi) * emission * (w2o * wi).z) / pdf;
 				}
-				num_samples++;
 			}
 			else {
 				for (int i = 0; i < ns_area_light; i++) {
@@ -133,7 +132,6 @@ namespace CGL {
 					if (!bvh->intersect(rr, &ir)) {
 						L_out += (isect.bsdf->f(w_out, w2o * wi) * emission * (w2o * wi).z) / pdf;
 					}
-					num_samples++;
 				}
 			}
 		}
