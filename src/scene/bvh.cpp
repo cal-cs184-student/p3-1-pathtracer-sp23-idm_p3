@@ -75,7 +75,7 @@ namespace CGL {
 			BBox bbox;
 
 			Vector3D split = 0;
-			
+
 			for (auto p = start; p != end; p++) {
 				BBox bb = (*p)->get_bbox();
 				bbox.expand(bb);
@@ -115,32 +115,42 @@ namespace CGL {
 			// Intersection version cannot, since it returns as soon as it finds
 			// a hit, it doesn't actually have to find the closest hit.
 
-
-
-			for (auto p : primitives) {
-				total_isects++;
-				if (p->has_intersection(ray))
-					return true;
+			double t0, t1;
+			if (!node || !node->bb.intersect(ray, t0, t1))
+				return false;
+			else if (node->isLeaf()) {
+				for (auto p = node->start; p != node->end; p++) {
+					total_isects++;
+					if ((*p)->has_intersection(ray))
+						return true;
+				}
+				return false;
 			}
-			return false;
-
-
+			else {
+				return has_intersection(ray, node->l) || has_intersection(ray, node->r);
+			}
+			
 		}
 
 		bool BVHAccel::intersect(const Ray& ray, Intersection* i, BVHNode* node) const {
 			// TODO (Part 2.3):
 			// Fill in the intersect function.
 
-
-
-			bool hit = false;
-			for (auto p : primitives) {
-				total_isects++;
-				hit = p->intersect(ray, i) || hit;
+			double t0, t1;
+			if (!node || !node->bb.intersect(ray, t0, t1))
+				return false;
+			else if (node->isLeaf()) {
+				bool hit = false;
+				for (auto p = node->start; p != node->end; p++) {
+					total_isects++;
+					hit = (*p)->intersect(ray, i) || hit;
+				}
+				return hit;
 			}
-			return hit;
-
-
+			
+			bool a = intersect(ray, i, node->l);
+			bool b = intersect(ray, i, node->r);
+			return a || b;
 		}
 
 	} // namespace SceneObjects
