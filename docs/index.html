@@ -41,7 +41,7 @@
 
 <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
 <h1 align="middle">Project 3-1: Path Tracer</h1>
-<h2 align="middle">YOUR NAME(S)</h2>
+<h2 align="middle">Puyuan Yi, Haoda Li</h2>
 
 <!-- Add Website URL -->
 <h2 align="middle">Website URL: <a href="TODO">TODO</a></h2>
@@ -96,16 +96,41 @@ Show images with normal shading for a few small .dae files. -->
 <h3>
   Walk through the ray generation and primitive intersection parts of the rendering pipeline.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
-</p>
+<ul>
+    <li style="line-height:200%">
+        To generate a ray, we first find the location (pixel) that we want in our pictures (pixel coordinate). Then we project this location to the camera coordinate by using
+        the field of view on two directions. The z value will
+        be set to -1 in default and our origin is (0, 0, 0). Now we have our origin and normalized vector in camera coordinate and finally we project the ray to the world coordinate.
+        Multiple sampling for a single pixel can be performed by perturbing the ray direction (We can use <b>get_sample()</b> to help use do this). This is
+        the <b>Monte Carlo estimation</b>.
+    </li>
+    <li style="line-height:200%">
+        For the primitive intersection, our work is to find the intersection of a given ray and a given object.
+        We want to know the intersection point(know the vector t). For objects in different shapes, we have different methods.
+        For example, we will use <b>Moller-Trumbore Algorithm</b>to calculate the result.
+    </li>
+</ul>
 <br>
 
-<h3>
+<h3 style="line-height:200%">
   Explain the triangle intersection algorithm you implemented in your own words.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    The slides provide us with the solution: We can first do ray intersection with a plane and then judge
+    whether our intersection point is inside our triangle. We use <b>Moller-Trumbore Algorithm</b> in this part. This algorithm's basic logic is:
+    <ul>
+        <li style="line-height:200%">
+            Check if the ray is parallel to the triangle. When parallel happens, the dot product between the ray's direction vector 
+            and the plane's normal vector will be zero. 
+        </li>
+        <li style="line-height:200%">
+            Check if the ray-plane intersection lies outside the triangle by using barycentric coordinates.
+        </li>
+    </ul>
+    After running algorithm, we will get our result. We will get a t value if our ray is not parallel to the triangle. And the rest b1 and b2
+    are barycentric coordinates. If the intersection point is inside the triangle, it should fulfill the requirement:
+    <p align="middle"><pre align="middle">b0, b1, b2 in [0, 1], b0 + b1 + b2 = 1</pre></p>
+    We can use this to judge whether the ray intersects with the triangle and also calculate the surface normal easily.
 </p>
 <br>
 
@@ -117,22 +142,22 @@ Show images with normal shading for a few small .dae files. -->
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="part1/1.png" align="middle" width="400px"/>
+        <figcaption>sky/CBspheres_lambertian.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="part1/2.png" align="middle" width="400px"/>
+        <figcaption>sky/bunny.dae</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example3.dae</figcaption>
+        <img src="part1/3.png" align="middle" width="400px"/>
+        <figcaption>meshedit/teapot.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example4.dae</figcaption>
+        <img src="part1/4.png" align="middle" width="400px"/>
+        <figcaption>simple/cube.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -148,8 +173,14 @@ Compare rendering times on a few scenes with moderately complex geometries with 
 <h3>
   Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+   The first part and most important part for the BVH algorithm is to construct BVH tree. For leaf nodes in this tree, they
+    will save the pointer to the corresponding primitives. For internal nodes, they will save the pointer to their left and right trees. All nodes
+    save their bounding box in order to do intersection test.While building the tree, we need to use a heuristic to find the optimal axis to seperate our
+    nodes. Our used heuristic is <b>surface area heuristic</b>. During this heuristic, our cost is calculated by the following equation:
+    <p align="middle"><pre align="middle">Cost(node) = Cost_trav + SA(L) * Count(L) + SA(R) * Count(R)</pre></p>
+    where the SA is the surface area of the bbox, it can be easily calculated by the bbox <b>extent</b> member. After finding the best axis, we utilize
+    this axis to divide our node and build our BVH tree. 
 </p>
 
 <h3>
@@ -160,22 +191,22 @@ Compare rendering times on a few scenes with moderately complex geometries with 
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="part2/1.png" align="middle" width="400px"/>
+        <figcaption>meshedit/maxplanck.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="part2/2.png" align="middle" width="400px"/>
+        <figcaption>sky/CBlucy.dae </figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example3.dae</figcaption>
+        <img src="part2/3.png" align="middle" width="400px"/>
+        <figcaption>sky/dragon.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example4.dae</figcaption>
+        <img src="part2/4.png" align="middle" width="400px"/>
+        <figcaption>sky/blob.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -185,9 +216,38 @@ Compare rendering times on a few scenes with moderately complex geometries with 
 <h3>
   Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    Here is the result table that comparing rendering times on a few scenes with and without BVH acceleration. The first line is the selected scenes, 
+    the second line is the rending time use BVH construction and the third line without. We can notice that for the simple scenes, such as cube.dae, the time
+    difference is small and even without BVH is faster than BVH (because we do not need to build trees.) But for the larger scens, the rendering with BVH
+    acceleration is much faster!
 </p>
+<div style="text-align: center;">
+    <table style="width: 100%;">
+        <thead>
+            <tr>
+                <th>sky/bunny.dae</th>
+                <th>meshedit/cow.dae</th>
+                <th>simple/cube.dae</th>
+                <th>sky/CBlucy.dae</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.3631s</td>
+                <td>0.3163s</td>
+                <td>0.1338s</td>
+                <td>0.3705s</td>
+            </tr>
+            <tr>
+                <td>204.36s</td>
+                <td>31.45s</td>
+                <td>0.1203s</td>
+                <td>878.64s</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <br>
 
 <h2 align="middle">Part 3: Direct Illumination (20 Points)</h2>
