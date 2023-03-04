@@ -234,16 +234,37 @@ namespace CGL {
 
 		int num_samples = ns_aa;          // total samples to evaluate
 		Vector2D origin = Vector2D(x, y); // bottom left corner of the pixel
-
+		// illumnation is in float accuracy
+		float s1 = 0, s2 = 0;
+		float mean = 0, variance = 0;
+		float I;
+		int i;
 		Vector3D color(0);
-		for (int i = 0; i < num_samples; i++) {
+		for (i = 0; i < num_samples; i++) {
 			Vector2D r = gridSampler->get_sample();
 			Ray ray = camera->generate_ray((1. * x + r.x) / sampleBuffer.w, (1. * y + r.y) / sampleBuffer.h);
-			color += 1. / num_samples * est_radiance_global_illumination(ray);
+			Vector3D radiance = est_radiance_global_illumination(ray);
+			color += radiance;
+
+
+			// begin part 5
+
+			float illumination = radiance.illum();
+			s1 += illumination;
+			s2 += illumination * illumination;
+			if ((i + 1) % samplesPerBatch == 0) {// batch evaluation
+				mean = s1 / float(i + 1);
+				variance = (1.0 / float(i)) * (s2 - s1 * s1 / float(i + 1));
+				variance = sqrt(variance);
+				I = 1.96 * variance / sqrt(float(i + 1));
+				if (I <= maxTolerance * mean) {// stop
+					break;
+				}
+			}
 		}
 
-		sampleBuffer.update_pixel(color, x, y);
-		sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
+		sampleBuffer.update_pixel(color / float(i + 1), x, y);
+		sampleCountBuffer[x + y * sampleBuffer.w] = i;
 
 
 	}
