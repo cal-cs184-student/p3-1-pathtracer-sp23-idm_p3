@@ -48,43 +48,13 @@
 
 <br><br>
 
-
-<div align="center">
-  <table style="width=100%">
-      <tr>
-          <td align="middle">
-          <img src="images/example_image.png" width="480px" />
-          <figcaption align="middle">Results Caption: my bunny is the bounciest bunny</figcaption>
-      </tr>
-  </table>
-</div>
-
-<p>All of the text in your write-up should be <em>in your own words</em>. If you need to add additional HTML features to this document, you can search the <a href="http://www.w3schools.com/">http://www.w3schools.com/</a> website for instructions. To edit the HTML, you can just copy and paste existing chunks and fill in the text and image file names appropriately.</p>
-<o>The website writeup is intended to be a self-contained walkthrough of the assignment: we want this to be a piece of work which showcases your understanding of relevant concepts through both mesh images as well as written explanations about what you did to complete each part of the assignment. Try to be as clear and organized as possible when writing about your own output files or extensions to the assignment. We want to understand what you've achieved and how you've done it!</p> 
-<p>If you are well-versed in web development, feel free to ditch this template and make a better looking page.</p>
-
-
-<p>Here are a few problems students have encountered in the past. Test your website on the instructional machines early!</p>
-<ul>
-<li>Your main report page should be called index.html.</li>
-<li>Be sure to include and turn in all of the other files (such as images) that are linked in your report!</li>
-<li>Use only <em>relative</em> paths to files, such as <pre>"./images/image.jpg"</pre>
-Do <em>NOT</em> use absolute paths, such as <pre>"/Users/student/Desktop/image.jpg"</pre></li>
-<li>Pay close attention to your filename extensions. Remember that on UNIX systems (such as the instructional machines), capitalization matters. <pre>.png != .jpeg != .jpg != .JPG</pre></li>
-<li>Be sure to adjust the permissions on your files so that they are world readable. For more information on this please see this tutorial: <a href="http://www.grymoire.com/Unix/Permissions.html">http://www.grymoire.com/Unix/Permissions.html</a></li>
-<li>And again, test your website on the instructional machines early!</li>
-</ul>
-
-
-<p>Here is an example of how to include a simple formula:</p>
-<p align="middle"><pre align="middle">a^2 + b^2 = c^2</pre></p>
-<p>or, alternatively, you can include an SVG image of a LaTex formula.</p>
-
-<div>
-
-<h2 align="middle">Overview</h2>
-<p>
-    YOUR RESPONSE GOES HERE
+<h2 align="middle" >Overview</h2>
+<p style="line-height:200%">
+    In this project, we gained a deep understanding of the whole pipeline of path tracing. To be more specific, we first learned how to write
+    the basic intersection of different primitives (triangle and sphere), adjust our camera and generate rays. Later, in order to 
+    make our intersection judgement faster, we constructed BVH tree and accelerated our intersection judgement. After finishing all the 
+    intersection calculation part, we implemented direct illumination and global illumination based on Monte Carlo integration. Finally, in order to
+    improve our rendering quality, we utilized adaptive sampling to reduce the noise in our rendered picture.
 </p>
 <br>
 
@@ -261,27 +231,7 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
 </h3>
 <p style="line-height:200%">
     In this part, we implemented uniform hemisphere sampling and lighting sampling, here is how we implemented them:
-    <ul>
-        <li style="line-height:200%">
-            <b>Uniform hemisphere sampling</b>: In uniform hemisphere sampling, 
-            the direct lighting function computes the contribution of each light source by sampling directions on the hemisphere 
-            that is oriented towards the surface being shaded. 
-            This is achieved by generating random directions on the hemisphere and computing the contribution of 
-            each light source in that direction. It is very easy to get the random sampling by <b>sampler</b> and get the 
-            contribution of light source by <b>get_emmision()</b> * Cos(Theta).Then we can calculate the final result combined with <b>BSDF</b>.
-
-
-        </li>
-        <li style="line-height:200%">
-            <b>Lighting sampling</b>: In lighting sampling, the direct lighting function computes the contribution of each light source
-            by sampling points on the surface of the light source and
-            computing the contribution of each point to the final color of the surface being shaded.
-            This is achieved by generating random points on the surface of the light source(<b>light->sample_L</b>)
-            and judging whether the new rays hit other primitives before light sources. We can limit our new_generated rays' <b>max_t</b>
-            to know whether they hit other objects before hitting the lights.The calculation equation is the same as uniform hemisphere sampling,
-            but the logistic is a little bit different.
-        </li>
-    </ul>
+    ·
 </p>
 
 <h3>
@@ -387,8 +337,27 @@ You will probably want to use the instructional machines for the above renders i
 <h3>
   Walk through your implementation of the indirect lighting function.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    Here's a high-level overview of how we implemented the indirect lighting function using path tracing:
+    <ul>
+        <li style="line-height:200%">
+            Trace a primary ray from the camera into the scene.
+        </li>
+        <li style="line-height:200%">
+            At the first surface hit by the primary ray,
+            generate a random direction for a secondary ray  with its pdf to be bounced off of the surface.
+            We can do this by utilizing <b>sample_f</b> function.
+        </li>
+        <li style="line-height:200%">
+            If the secondary ray hits another surface, repeat these steps
+            until the ray eventually get killed by <b>Russian Roulette</b> or <b>reaches a maximum depth</b>.
+        </li>
+        <li style="line-height:200%">
+            Calculating the contribution of indirect lighting using unbiased Monte Claro estimation (divided by p, p is the probability
+            of Russian Roulette.)
+        </li>
+    </ul>
+    We run this function recursively to get the indirect lighting!
 </p>
 <br>
 
@@ -400,12 +369,12 @@ You will probably want to use the instructional machines for the above renders i
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="part4/1_1.png" align="middle" width="400px"/>
+        <figcaption>sky/CBspheres_lambertian.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="part4/1_2.png" align="middle" width="400px"/>
+        <figcaption>sky/bunny.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -420,19 +389,22 @@ You will probably want to use the instructional machines for the above renders i
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Only direct illumination (example1.dae)</figcaption>
+        <img src="part4/2_1.png" align="middle" width="400px"/>
+        <figcaption>Only direct illumination (sky/CBspheres_lambertian.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Only indirect illumination (example1.dae)</figcaption>
+        <img src="part4/2_2.png" align="middle" width="400px"/>
+        <figcaption>Only indirect illumination (sky/CBspheres_lambertian.dae)</figcaption>
       </td>
     </tr>
   </table>
 </div>
 <br>
-<p>
-    YOUR EXPLANATION GOES HERE
+<p style="line-height:200%">
+    It is very easy to understand that the direct illumination result is the same as the result of part3. And all the white pixels in the 
+    images are the pixels that can directly get the light from the light source. But for the indirect illumination, the pixels get the light energy from the light
+    source after at least one bounce from other objects. For example, for the ceiling area, the direct illumination is completely dark (because we do not add zero bounce illumination in this experiment.)
+    But for the indirect illumination, the ceiling will get its indirect light reflected from other objects.
 </p>
 <br>
 
@@ -444,35 +416,40 @@ You will probably want to use the instructional machines for the above renders i
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
+        <img src="part4/3_1.png" align="middle" width="400px"/>
         <figcaption>max_ray_depth = 0 (CBbunny.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
+        <img src="part4/3_2.png" align="middle" width="400px"/>
         <figcaption>max_ray_depth = 1 (CBbunny.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
+        <img src="part4/3_3.png" align="middle" width="400px"/>
         <figcaption>max_ray_depth = 2 (CBbunny.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
+        <img src="part4/3_4.png" align="middle" width="400px"/>
         <figcaption>max_ray_depth = 3 (CBbunny.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
+        <img src="part4/3_5.png" align="middle" width="400px"/>
         <figcaption>max_ray_depth = 100 (CBbunny.dae)</figcaption>
       </td>
     </tr>
   </table>
 </div>
 <br>
-<p>
-    YOUR EXPLANATION GOES HERE
+<p style="line-height:200%">
+    We have alreadly seen the pictures (m = 0 and m = 1)before, because m = 0 equals to <b>zero_bounce_illumination</b> and m = 1
+    equals to <b>one_bound_illumination</b>.And all the rest pictures are <b>global_illumination</b>.It has to be mentioned that the difference
+    between global illumination is small, even we increase the max_ray_length from 3 to 100. The only intuitive feeling is that the higher the max_
+    ray_length, the brighter the picture. That is because there are so little light information after many rounds of bounces. In summary,
+    the choice of our max_ray_length should depend on the requirements of the final rendering accuracy,
+    as well as factors such as rendering time and computational resources.
 </p>
 <br>
 
@@ -484,45 +461,63 @@ You will probably want to use the instructional machines for the above renders i
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>1 sample per pixel (example1.dae)</figcaption>
+        <img src="part4/4_1.png" align="middle" width="400px"/>
+        <figcaption>1 sample per pixel (sky/dragon.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>2 samples per pixel (example1.dae)</figcaption>
-      </td>
-    </tr>
-    <tr align="center">
-      <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>4 samples per pixel (example1.dae)</figcaption>
-      </td>
-      <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>8 samples per pixel (example1.dae)</figcaption>
+        <img src="part4/4_2.png" align="middle" width="400px"/>
+        <figcaption>2 samples per pixel (sky/dragon.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>16 samples per pixel (example1.dae)</figcaption>
+        <img src="part4/4_3.png" align="middle" width="400px"/>
+        <figcaption>4 samples per pixel (sky/dragon.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>64 samples per pixel (example1.dae)</figcaption>
+        <img src="part4/4_4.png" align="middle" width="400px"/>
+        <figcaption>8 samples per pixel (sky/dragon.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>1024 samples per pixel (example1.dae)</figcaption>
+        <img src="part4/4_5.png" align="middle" width="400px"/>
+        <figcaption>16 samples per pixel (sky/dragon.dae)</figcaption>
+      </td>
+      <td>
+        <img src="part4/4_6.png" align="middle" width="400px"/>
+        <figcaption>64 samples per pixel (sky/dragon.dae)</figcaption>
+      </td>
+    </tr>
+    <tr align="center">
+      <td>
+        <img src="part4/4_7.png" align="middle" width="400px"/>
+        <figcaption>1024 samples per pixel (sky/dragon.dae)</figcaption>
       </td>
     </tr>
   </table>
 </div>
 <br>
-<p>
-    YOUR EXPLANATION GOES HERE
+<p style="line-height:200%">
+    Here is several main differences with different sample-per-pixel rates:
+    <ul>
+        <li style="line-height:200%">
+            <b>Noise</b>: When rendering with a low sample-per-pixel rate, the image can be noisy. This is 
+            because there are not enough samples per pixel to accurately estimate the lighting in the scene, resulting in a less accurate image.
+            (Higher the sample rate, lower the variance of Monte Carlo integration)
+        </li>
+        <li style="line-height:200%">
+            <b>Blurring</b>: When rendering with a high sample-per-pixel rate, the image can be overly smooth or blurry. T
+            his is because the Monte Carlo integration is averaging over a large number of samples, 
+            which can smooth out details and result in a less sharp image.
+        </li>
+        <li style="line-height:200%">
+            <b>Render time</b>: The higher the sample-per-pixel rate, the longer it takes to render the image. 
+            This is because the algorithm needs to perform more calculations for each pixel, 
+            and thus requires more processing time.For example, it only takes me nearly 1 min to render in 64 sample-per-pixel rate, but nearly 20 mins
+            in 1024 sample-per-pixel rate.
+        </li>
+    </ul>
 </p>
 <br>
 
@@ -534,8 +529,24 @@ Pick one scene and render it with at least 2048 samples per pixel. Show a good s
 <h3>
   Explain adaptive sampling. Walk through your implementation of the adaptive sampling.
 </h3>
-<p>
-    YOUR RESPONSE GOES HERE
+<p style="line-height:200%">
+    The basic idea of adaptive sampling is to concentrate sampling in areas of the scene that are more important or difficult to render,
+    while reducing the number of samples in areas where the image is already well-sampled.
+    Our algorithm works by estimating the variance of the illumination at each pixel, and using this information to determine where to stop sampling.
+    Areas with high variance will sample many times (up to 2048 in our experiments), while areas with low variance are given fewer samples.
+    To be more specific, here is our implementation:
+    <ul>
+        <li style="line-height:200%">
+            Compute the variance and mean of the illumination at each pixel. However, we do not compute for each new sample, we
+            do this computation per <b>samplesPerBatch</b>
+        </li>
+        <li style="line-height:200%">
+            If the pixel is already converged, which means this pixel fulfills this equation:
+            <p align="middle"><pre align="middle">1.96 * variance / sqrt(sample times) <= maxTolerance * mean</pre></p>
+            (In our experiment, maxTolerance is set to 0.5). We stop the sampling for loop immediately.
+            
+        </li>
+    </ul>
 </p>
 <br>
 
@@ -547,22 +558,22 @@ Pick one scene and render it with at least 2048 samples per pixel. Show a good s
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Rendered image (example1.dae)</figcaption>
+        <img src="part5/1_1.png" align="middle" width="400px"/>
+        <figcaption>Rendered image (sky/CBbunny.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Sample rate image (example1.dae)</figcaption>
+        <img src="part5/1_2.png" align="middle" width="400px"/>
+        <figcaption>Sample rate image (sky/CBbunny.dae)</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Rendered image (example2.dae)</figcaption>
+        <img src="part5/1_3.png" align="middle" width="400px"/>
+        <figcaption>Rendered image (sky/dragon.dae)</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>Sample rate image (example2.dae)</figcaption>
+        <img src="part5/1_4.png" align="middle" width="400px"/>
+        <figcaption>Sample rate image (sky/dragon.dae)</figcaption>
       </td>
     </tr>
   </table>

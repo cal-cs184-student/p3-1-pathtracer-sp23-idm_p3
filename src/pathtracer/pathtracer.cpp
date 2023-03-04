@@ -170,6 +170,24 @@ namespace CGL {
 
 		Vector3D L_out(0, 0, 0);
 
+		L_out += one_bounce_radiance(r, isect);
+		Vector3D w_in;
+		double pdf;
+
+		Vector3D f = isect.bsdf->sample_f(w_out, &w_in, &pdf);
+		Ray rr = Ray(hit_p, o2w * w_in);
+		rr.depth = r.depth + 1;
+		double prob = 1;
+		if (rr.depth >= max_ray_depth){
+			// if over than max_ray_depth, stop 
+			return L_out;
+		}
+		rr.min_t = EPS_F;
+		Intersection ir;
+		if (!coin_flip(prob))return L_out;
+		if (bvh->intersect(rr, &ir)) {
+			L_out += (f * at_least_one_bounce_radiance(rr, ir) * abs(w_in.z))/pdf /prob;
+		}
 		// TODO: Part 4, Task 2
 		// Returns the one bounce radiance + radiance from extra bounces at this point.
 		// Should be called recursively to simulate extra bounces.
@@ -194,9 +212,9 @@ namespace CGL {
 
 		if (!bvh->intersect(r, &isect))
 			return L_out;
-		L_out = (isect.t == INF_D) ? debug_shading(r.d) : normal_shading(isect.n);
+		//L_out = (isect.t == INF_D) ? debug_shading(r.d) : normal_shading(isect.n);
 		// TODO (Part 3): Return the direct illumination.
-		//L_out = zero_bounce_radiance(r, isect) + one_bounce_radiance(r, isect);
+		L_out = zero_bounce_radiance(r, isect)+ at_least_one_bounce_radiance(r, isect);
 
 		// TODO (Part 4): Accumulate the "direct" and "indirect"
 		// parts of global illumination into L_out rather than just direct
@@ -216,16 +234,37 @@ namespace CGL {
 
 		int num_samples = ns_aa;          // total samples to evaluate
 		Vector2D origin = Vector2D(x, y); // bottom left corner of the pixel
-
+		// illumnation is in float accuracy
+		float s1 = 0, s2 = 0;
+		float mean = 0, variance = 0;
+		float I;
+		int i;
 		Vector3D color(0);
-		for (int i = 0; i < num_samples; i++) {
+		for (i = 0; i < num_samples; i++) {
 			Vector2D r = gridSampler->get_sample();
 			Ray ray = camera->generate_ray((1. * x + r.x) / sampleBuffer.w, (1. * y + r.y) / sampleBuffer.h);
-			color += 1. / num_samples * est_radiance_global_illumination(ray);
+			Vector3D radiance = est_radiance_global_illumination(ray);
+			color += radiance;
+
+
+			// begin part 5
+
+			float illumination = radiance.illum();
+			s1 += illumination;
+			s2 += illumination * illumination;
+			if ((i + 1) % samplesPerBatch == 0) {// batch evaluation
+				mean = s1 / float(i + 1);
+				variance = (1.0 / float(i)) * (s2 - s1 * s1 / float(i + 1));
+				variance = sqrt(variance);
+				I = 1.96 * variance / sqrt(float(i + 1));
+				if (I <= maxTolerance * mean) {// stop
+					break;
+				}
+			}
 		}
 
-		sampleBuffer.update_pixel(color, x, y);
-		sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
+		sampleBuffer.update_pixel(color / float(i + 1), x, y);
+		sampleCountBuffer[x + y * sampleBuffer.w] = i;
 
 
 	}
